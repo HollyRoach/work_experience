@@ -1,0 +1,206 @@
+---
+title: "OCMS WorkExp: Create MIAverse TSE"
+author: "Holly Roach"
+format: html
+editor: source
+embed-resources: true
+code-fold: true
+execute: 
+  warning: false
+---
+
+## Aim
+
+[Miaverse](https://microbiome.github.io/) is an R/Bioconductor framework for microbiome data analysis. Documentation and example workflows can be found at the online book, [Orchestrating Microbiome Analysis with Bioconductor](https://microbiome.github.io/OMA/docs/devel/) (Lahti et al. 2021). 
+
+The aim of this work book is to create the [`TreeSummarizedExperiment`](https://www.bioconductor.org/packages/release/bioc//vignettes/TreeSummarizedExperiment/inst/doc/Introduction_to_treeSummarizedExperiment.html) object that is utilized for data analysis downstream.
+
+```{r load libraries}
+library(tidyverse) # for data parsing and plotting
+library(ggpubfigs) # for colorblind-friendly color palettes
+library(ggsignif)  # for plotting p-vals from significance testing
+
+# for using the miaverse framework
+library(mia)  
+library(miaViz)
+```
+
+```{r turn off scientific notation}
+options(scipen=999)
+```
+
+```{r load data}
+# metadata for samples
+metadata <- read_csv(
+  r"(data\metadata.csv)"
+  )
+  
+# relative abundance data for samples
+relab <- read_csv(
+  r"(data\metaphlan4_relative_abundances.csv)",
+  )
+```
+
+## Create TSE Object
+
+Remove any samples were no taxa have been aligned.
+
+```{r relab w/ no assigned taxa}
+# find samples where no taxa have been aligned --> suggests failed seq
+failed_relab <- relab |> 
+  select(where(\(x) all(x == 0)))
+
+# exclude samples where no taxa have been aligned --> suggests failed seq
+relab <- relab |> 
+  select(where(\(x) !all(x == 0)))
+
+dim(failed_relab)
+```
+
+This shows that there taxa were assigned to every samples.
+
+To create a TSE object the following objects are required:
+
+1.  Row data (`taxa_df`):
+    - DataFrame containing taxonomic information for different taxa
+    - row names should correspond to taxa IDs
+    - first row (column headings) provides taxa ranks (eg Kingdom, Phylum etc)
+    - row names should match 1:1 with row names in the Abundance table
+
+```{r create rowData}
+# create table showing the kingdom phylum class order family genus species for
+# each taxa recorded in the microbiome data
+# separate base on pattern "|"  
+taxa <- data.frame(
+  stringr::str_split_fixed(relab$clade_name,
+  stringr::fixed("|"),
+  8)
+)
+
+# add column names
+names(taxa) <- c(
+  "kingdom", "phylum", "class", "order", "family", "genus", "species", "strain"
+)
+
+# add a taxon column
+taxa$clade_name <- relab$clade_name
+
+# replace empty string values with NA
+taxa[taxa==""] <- NA
+
+# add column to contain taxa
+taxa <- taxa |> 
+  mutate(
+    taxa = case_when(
+      !is.na(strain) ~ strain,
+      !is.na(species) ~ species,
+      !is.na(genus) ~ genus,
+      !is.na(family) ~ family,
+      !is.na(order) ~ order,
+      !is.na(class) ~ class,
+      !is.na(phylum) ~ phylum,
+      !is.na(kingdom) ~ kingdom)
+    )
+
+# add rownames
+row.names(taxa) <- taxa$taxa
+
+# rowData needs to be in DataFrame format
+taxa_df <- DataFrame(select(taxa, -clade_name, -taxa))
+
+# view first 3 taxa
+taxa_df[1:3, 1:8]
+```
+
+2.  Abundance table (`relab_mat`):
+    - data matrix containing taxa abundances for each sample
+    - row names should correspond to taxa IDs
+    - first row (column headings) provides sample IDs
+
+```{r create relab_mat}
+# the assays slot contains the experimental data as multiple count matrices.
+# the result of assays is a list of matrices.
+# the matrices can contain relative abundance, or estimated count data etc
+
+# format relab to be suitable to add to assays
+relab_mat <- relab |> 
+  # remove taxon  
+  select(
+    - clade_name
+    ) |> 
+  # convert to matrix
+  as.matrix() 
+
+# add taxa names to matrix
+row.names(relab_mat) <- taxa$taxa
+```
+
+3.  Col data (`metadata_df`):
+    - DataFrame containing metadata relating to each microbiome sample
+    - row names should correspond to sample IDs
+    - first row (column headings) provides metadata variables
+    - row names should match 1:1 with column heading names in the Abundance table
+
+```{r create colData}
+# remove metadata for samples with no assigned taxa 
+# step not applicable
+
+# create as dataframe (rownames is depricated with tibbles) 
+metadata_df <- as.data.frame(metadata) 
+
+# add row names
+row.names(metadata_df) <- metadata_df$microbiome_id
+
+
+# view metadata for first 3 participants  
+metadata_df[1:3, ]
+```
+
+Overall there are: 
+
+*    682 observations (taxa) within the row data (`taxa_df`)
+*    9 observations (microbiome samples) within the col data (`metadata_df`) 
+*    682 observations (taxa) and 9 variables (microbiome samples) with the abundance table (`relab_mat`).
+
+This shows that we have data for each taxa within each sample.
+
+**Before creating TSE object, ensure that the row and column names match one-to-one between abundance table, row data, and col data**
+
+```{r create tse}
+# ensure that the row and column names match one-to-one between 
+# abundance table, rowdata, and coldata
+
+# Match rows and columns
+relab_mat <- relab_mat[rownames(taxa_df), rownames(metadata_df)]
+
+# check coldata rownames match assay colnames
+all(rownames(metadata_df) == colnames(relab_mat))
+
+# check rowdata rownames match assay rownames
+all(rownames(taxa_df) == rownames(relab_mat))
+
+# add relab matrices to assays list
+assays <- SimpleList(
+  taxa_relab = relab_mat
+)
+
+#### create tse
+tse <- TreeSummarizedExperiment(
+  assays = assays,       
+  colData = metadata_df,
+  rowData = taxa_df
+)
+
+# agglomerate to taxonomy data to the species level
+  tse_species <- agglomerateByRank(
+    tse,
+    assay.type = "taxa_relAb",
+    rank = "species"
+  )
+
+# view relab data for first 3 samples and taxa stored in tse object
+assay(tse_species, "taxa_relab")[1:3, 1:3]
+
+# save TSE
+saveRDS(tse_species, file = "01_create_tse/tse_species.rds")
+```
