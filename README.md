@@ -32,6 +32,8 @@ To do this analysis you will work through the online tutorial book, [Orchestrati
 
 This github repo has been specifically set up in order to complete this early life microbiome analysis, as it contains the data inputs as well as the correct R enviroment.
 
+#### How to clone repository
+
 Follow these steps on how to clone this github repo:
 
 1. move to parent dir where the analysis will take place
@@ -51,3 +53,18 @@ positron .
 # code for positron terminal
 renv::restore()
 ```
+
+#### What analysis to perform
+
+We will investigate the following three areas:
+
+1.   Comunity composition - what microbes are present within the samples
+2.   Alpha diversity - within an individual sample how many microbes are present
+3.   Beta diversity - are the samples which are more similar to eachother
+
+To complete these analyeses you will work through the following notebooks which can be found at:
+
+1.  `02_community_comp\Inspect_Community_Composition.qmd`
+2.  `03_alpha_diversity\Inspect_Alpha_Diversity.qmd`
+3.  `04_beta_diveristy\Inspect_Beta_Diveristy.qmd`
+

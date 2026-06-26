@@ -1,0 +1,109 @@
+---
+title: "OCMS WorkExp: Alpha Diversity"
+author: "Holly Roach"
+format: html
+editor: source
+embed-resources: true
+code-fold: true
+execute: 
+  warning: false
+---
+
+## Aim
+
+This notebook will inspect whether alpha diversity changes across the samples usng functions from [Miaverse](https://microbiome.github.io/).
+
+Alpha diversity summarises the distribution of microbe abundances in a given sample into a single number that depends on microbe richness and evenness. Richness refers to the total number of microbes in sample, while evenness refers to distrubition of microbe abundances.
+
+In particular, we will investigate:
+
+1.   Does alpha diveristy change overtime? ie are there any common trends when comparing across `time_point` or `age_days`
+2.   Are there differences in alpha diveristy between donors?
+
+We will answer these questions using the following functions:
+
+1.   `addAlpha()`
+2.   `plotColData()`
+3.   `pairwise.wilcox.test()`
+
+Information on how to run these functions can be found in the online tutorial book, [Orchestrating Microbiome Analysis with Bioconductor](https://microbiome.github.io/OMA/docs/devel/) in:
+
+*    [Chapter 13 Alpha diveristy](https://microbiome.github.io/OMA/docs/devel/pages/alpha_diversity.html)
+
+Of note, you will be applying these functions to your own data, so you do not need to load any new tse objects. Therefore, in the tutorial you can ignore the following steps:
+
+```
+data("GlobalPatterns")
+tse <- GlobalPatterns
+```
+
+In addition, you only need to look at Shannon Indexes and Richness. Therefore, you do not need to calculate and plot values for `dbp_dominance` or `faith_diversity`.
+
+Also, feel free to generate your own figures using `ggplot`. To do this you will need to convert you tse object into a tidyverse dataframe using the following code:
+
+```
+# extract data as a dataframe
+  alpha_df <- as.data.frame(
+    colData(tse)
+  )
+```
+
+
+```{r load libraries}
+library(tidyverse) # for data parsing and plotting
+library(ggpubfigs) # for colorblind-friendly color palettes
+library(ggsignif)  # for plotting p-vals from significance testing
+
+# for using the miaverse framework
+library(mia)  
+library(miaViz)
+library(scater)
+```
+
+```{r turn off scientific notation}
+options(scipen=999)
+```
+
+```{r load data}
+# metadata for samples
+metadata <- read_csv(
+  r"(data\metadata.csv)"
+  )
+  
+# relative abundance data for samples
+relab <- read_csv(
+  r"(data\metaphlan4_relative_abundances.csv)",
+  )
+
+# tse object containing both the metadata and relative abundance data
+# this object was created using the script found in the dir 01_create_tse
+tse <- readRDS(
+  r"(01_create_tse\tse_species.rds)"
+)
+```
+
+## Inspect Alpha diversity
+
+Following instructions in [Chapter 13 Alpha diveristy](https://microbiome.github.io/OMA/docs/devel/pages/alpha_diversity.html) to inspect how alpha diversity differs between donors and ages.
+
+Of note, inspect your metadata file to find out what groups you could use to seperate your data by. To do this, you will need to change what the `colour.by` paramter is set to.
+
+```{r}
+# write your code in here
+
+```
+
+```{r}
+# write your code in here
+
+```
+
+```{r}
+# write your code in here
+
+```
+
+What do you think these graphs tell us?
+
+*write your thoughts here*
+
