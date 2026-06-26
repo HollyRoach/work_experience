@@ -30,3 +30,5 @@ renv::restore()
 
 # BiocManager::install("mia", force=TRUE, type="binary")
 # BiocManager::install("miaViz", force=TRUE, type="binary")
+# BiocManager::install("scater", force=TRUE, type="binary")
+# BiocManager::install("sechm", force=TRUE)
