@@ -1,0 +1,56 @@
+---
+title: "Dateset - Analysis"
+author: "Holly Roach"
+format: html
+editor: source
+embed-resources: true
+code-fold: true
+execute: 
+  warning: false
+---
+
+## Background
+
+## Aim
+
+```{r load libraries}
+library(tidyverse) # for data parsing and plotting
+library(ggpubfigs) # for colorblind-friendly color palettes
+library(ggsignif)  # for plotting p-vals from significance testing
+
+library(mia)
+library(miaViz)
+```
+
+```{r turn off scientific notation}
+options(scipen=999)
+```
+
+```{r create ggplot theme}
+my_theme = theme(
+  # change aesthetics of the text
+  plot.title = element_text(size=12, face = "bold"),
+  axis.title.x = element_text(size=11),
+  axis.title.y = element_text(size=11),
+  axis.text.x = element_text(size=9),
+  axis.text.y = element_text(size=9),
+  strip.text = element_text(size=11, face = "bold"),
+  # change visuals
+  panel.background = element_rect(fill = "transparent"),
+  panel.border = element_rect(colour = "black", fill = NA),
+  plot.background = element_rect(fill = "transparent"),
+  panel.grid=element_line(colour="#DDDDDD"),
+  legend.background = element_rect(fill = "transparent"),
+  legend.key = element_rect(fill = "transparent"),
+  # facet visuals
+  strip.background = element_rect(
+     color="black", fill="white", linewidth=0.5, linetype="solid"
+     )
+)
+```
+
+```{r load data}
+# df <- read_csv(
+#   r"()"
+# )
+```
