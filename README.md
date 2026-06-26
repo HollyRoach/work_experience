@@ -60,11 +60,9 @@ We will investigate the following three areas:
 
 1.   Comunity composition - what microbes are present within the samples
 2.   Alpha diversity - within an individual sample how many microbes are present
-3.   Beta diversity - are the samples which are more similar to eachother
 
 To complete these analyeses you will work through the following notebooks which can be found at:
 
 1.  `02_community_comp\Inspect_Community_Composition.qmd`
 2.  `03_alpha_diversity\Inspect_Alpha_Diversity.qmd`
-3.  `04_beta_diveristy\Inspect_Beta_Diveristy.qmd`
 
