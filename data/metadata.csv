@@ -1,4 +1,4 @@
-﻿microbiome_id,sample_id,time_point,age_days,sex
+﻿microbiome_id,donor_id,time_point,age_days,sex
 A23,G3,week_3,21,male
 A24,B116,week_3,21,male
 A25,O26,week_3,21,male
