@@ -79,7 +79,7 @@ taxa <- data.frame(
 
 # add column names
 names(taxa) <- c(
-  "kingdom", "phylum", "class", "order", "family", "genus", "species", "strain"
+  "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species", "Strain"
 )
 
 # add a taxon column
@@ -92,14 +92,14 @@ taxa[taxa==""] <- NA
 taxa <- taxa |> 
   mutate(
     taxa = case_when(
-      !is.na(strain) ~ strain,
-      !is.na(species) ~ species,
-      !is.na(genus) ~ genus,
-      !is.na(family) ~ family,
-      !is.na(order) ~ order,
-      !is.na(class) ~ class,
-      !is.na(phylum) ~ phylum,
-      !is.na(kingdom) ~ kingdom)
+      !is.na(Strain) ~ Strain,
+      !is.na(Species) ~ Species,
+      !is.na(Genus) ~ Genus,
+      !is.na(Family) ~ Family,
+      !is.na(Order) ~ Order,
+      !is.na(Class) ~ Class,
+      !is.na(Phylum) ~ Phylum,
+      !is.na(Kingdom) ~ Kingdom)
     )
 
 # add rownames
@@ -181,7 +181,7 @@ all(rownames(taxa_df) == rownames(relab_mat))
 
 # add relab matrices to assays list
 assays <- SimpleList(
-  taxa_relab = relab_mat
+  relabundance = relab_mat
 )
 
 #### create tse
@@ -194,12 +194,12 @@ tse <- TreeSummarizedExperiment(
 # agglomerate to taxonomy data to the species level
   tse_species <- agglomerateByRank(
     tse,
-    assay.type = "taxa_relAb",
-    rank = "species"
+    assay.type = "relabundance",
+    rank = "Species"
   )
 
 # view relab data for first 3 samples and taxa stored in tse object
-assay(tse_species, "taxa_relab")[1:3, 1:3]
+assay(tse_species, "relabundance")[1:3, 1:3]
 
 # save TSE
 saveRDS(tse_species, file = "01_create_tse/tse_species.rds")
